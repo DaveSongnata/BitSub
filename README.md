@@ -1,8 +1,8 @@
 # BitSub
 
-**Legendas do YouTube, sem enrolação.** Cole um link, leia a legenda na tela, baixe em TXT, TXT com tempo, SRT ou VTT e, se quiser, peça um resumo ou tire dúvidas sobre o vídeo usando a **sua própria IA** (Gemini ou ChatGPT).
+**Legendas do YouTube, sem enrolação.** No ar em **https://bitsub.treent.com.br**. Cole um link, leia a legenda na tela, baixe em TXT, TXT com tempo, SRT ou VTT e, se quiser, peça um resumo ou tire dúvidas sobre o vídeo usando a **sua própria IA** (Gemini ou ChatGPT).
 
-Grátis, sem anúncio, sem cadastro. Funciona como app instalável (PWA), em português, inglês e espanhol, nos temas SLSO8 e Original, claro e escuro. É da mesma família do [BitTask](https://bittask.vercel.app).
+Grátis, sem anúncio, sem cadastro. Funciona como app instalável (PWA), em português, inglês e espanhol, nos temas SLSO8 e Original, claro e escuro. É da mesma família do [BitTask](https://bitask.treent.com.br).
 
 ---
 
@@ -42,12 +42,12 @@ Se o YouTube bloquear o servidor da Vercel, o app oferece o **botão BitSub** (b
 1. Suba esta pasta para um repositório no GitHub.
 2. Na Vercel: **Add New → Project**, escolha o repositório. Ela detecta Vite sozinha (`vercel.json` já configura tudo). Clique em **Deploy**.
 3. Depois do deploy, confira se o YouTube responde para o servidor:
-   `https://SEU-DOMINIO/api/tracks?v=dQw4w9WgXcQ&diag=1`
+   `https://bitsub.treent.com.br/api/tracks?v=dQw4w9WgXcQ&diag=1`
    Algum cliente com `"result": "ok"` = tudo certo. Se todos vierem `"blocked"`, troque a região da função (Settings → Functions → Function Region, ex.: `gru1` São Paulo ou `cdg1` Paris), faça redeploy e teste de novo. Mesmo bloqueado, o plano B (botão de favoritos e colar texto) continua funcionando.
 
 Não precisa de variável de ambiente nem de banco de dados.
 
-> Se o endereço final não for `bitsub.vercel.app`, troque o domínio na linha `og:image` do `index.html`. É a imagem que aparece quando alguém compartilha o link no WhatsApp ou nas redes, e ela precisa de endereço completo.
+> Se o domínio mudar, troque o endereço nas linhas `og:url`, `og:image` e `canonical` do `index.html`. É a imagem que aparece quando alguém compartilha o link no WhatsApp ou nas redes, e ela precisa de endereço completo.
 
 ## Rodar no computador
 
