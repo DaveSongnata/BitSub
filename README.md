@@ -23,20 +23,20 @@ Grátis, sem anúncio, sem cadastro. Funciona como app instalável (PWA), em por
 ## Como funciona (e por que tem uma função minúscula)
 
 ```
-Navegador ──(só o código do vídeo)──► /api/tracks (Vercel Function) ──► YouTube: "quais legendas existem?"
-Navegador ◄──── lista de legendas com endereços assinados ────────────┘
-Navegador ──────────────────────────────────────────────────────────► YouTube: texto da legenda (direto)
-Navegador ──────────────────────────────────────────────────────────► Google / OpenAI (direto, com a chave da pessoa)
+Navegador (iframe isolado, internet da própria pessoa) ──► YouTube: "quais legendas existem?" ──► ingresso assinado
+Navegador ─────────────────────────────────────────────► YouTube: texto da legenda (direto, com o ingresso)
+Navegador ─────────────────────────────────────────────► Google / OpenAI (direto, com a chave da pessoa)
+
+Só se o caminho acima falhar:  Navegador ──► /api/tracks (Vercel) ──► YouTube   →   e por último: botão de favoritos / colar texto
 ```
 
-O YouTube **libera** o download do texto da legenda para qualquer site (CORS), mas **bloqueia** a pergunta "quais legendas esse vídeo tem?" para sites que não são o youtube.com (testado em 12 endereços). Por isso existe uma única função sem estado em `api/tracks.ts`:
+Para baixar a legenda, o YouTube exige um "ingresso" (o endereço assinado da legenda), que vem junto da lista de legendas do vídeo.
 
-- recebe só o código do vídeo, não guarda nada, não registra nada;
-- nunca vê o texto da legenda, a chave da IA nem as conversas;
-- tenta vários clientes do YouTube (WEB → IOS → ANDROID → MWEB) e fica em cache na CDN por ~5 h por vídeo.
+1. **No navegador, sem servidor (caminho principal).** Um iframe escondido e isolado (`sandbox="allow-scripts"`, veja `src/lib/youtube/browser-player.ts`) faz o pedido ao YouTube com a internet da própria pessoa. Como o iframe não tem origem, o YouTube responde com `Access-Control-Allow-Origin: null` e a página consegue ler. Testado no Chrome, Firefox e Safari (WebKit). Cada pessoa usa o próprio IP, no ritmo de uma pessoa: não existe um servidor central para o YouTube bloquear, então escala com o número de usuários.
+2. **Servidor de reserva.** Se o caminho 1 falhar (o YouTube mudou algo, rede sinalizada…), entra `api/tracks.ts`: uma função sem estado que recebe só o código do vídeo, não guarda nem registra nada, e fica em cache na CDN. IPs de nuvem são bloqueados pelo YouTube de tempos em tempos, por isso ela é só reserva.
+3. **Botão BitSub (favoritos) e colar o texto**, que funcionam em qualquer situação.
 
-Se o YouTube bloquear o servidor da Vercel, o app oferece o **botão BitSub** (bookmarklet): ele roda dentro do youtube.com, com a conexão da própria pessoa, e entrega a lista para o BitSub. Nenhum servidor envolvido.
-
+O texto da legenda, a chave da IA e as conversas nunca passam por servidor do BitSub.
 ## Publicar na Vercel (grátis)
 
 1. Suba esta pasta para um repositório no GitHub.
