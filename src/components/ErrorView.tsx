@@ -4,7 +4,7 @@ import type { FetchErrorCode } from '@/lib/youtube/client';
 import { thumbnailUrl, watchUrl } from '@/lib/youtube/url';
 import { Icon } from './Icon';
 import { Mascot } from './Mascot';
-import { BookmarkletCard, PasteModal } from './PlanB';
+import { PasteModal } from './PlanB';
 import { Button } from './ui';
 
 const RETRYABLE = new Set<FetchErrorCode | 'playlist'>(['rate_limited', 'blocked', 'unknown', 'offline']);
@@ -62,11 +62,6 @@ export function ErrorView({
             </a>
           ) : null}
         </div>
-        {error === 'blocked' || error === 'rate_limited' ? (
-          <div className="hidden md:block">
-            <BookmarkletCard />
-          </div>
-        ) : null}
       </div>
       <PasteModal open={paste} onClose={() => setPaste(false)} defaultTitle={title} videoId={videoId} />
     </section>

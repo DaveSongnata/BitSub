@@ -1,10 +1,8 @@
-import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useId, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { parsePastedTranscript } from '@/lib/transcript';
 import { saveVideo } from '@/lib/db';
 import { navigate } from '@/lib/router';
-import { bookmarkletHref } from '@/lib/bookmarklet';
-import { Icon } from './Icon';
 import { Button, Modal } from './ui';
 
 export function PasteModal({
@@ -107,43 +105,5 @@ export function PasteModal({
         </Button>
       </form>
     </Modal>
-  );
-}
-
-export function BookmarkletCard() {
-  const { t } = useTranslation();
-  const link = useRef<HTMLAnchorElement>(null);
-
-  // React refuses javascript: URLs in JSX, so set it on the element directly.
-  useEffect(() => {
-    link.current?.setAttribute(
-      'href',
-      bookmarkletHref(window.location.origin, { open: t('bookmarklet.open'), fail: t('bookmarklet.fail') })
-    );
-  }, [t]);
-
-  return (
-    <div className="border-2 border-line bg-surface p-4 sm:p-5">
-      <p className="mb-1 flex items-center gap-2 font-semibold">
-        <Icon name="bookmark" size={18} />
-        {t('bookmarklet.title')}
-      </p>
-      <p className="mb-4 leading-relaxed text-muted">{t('bookmarklet.text')}</p>
-      <div className="flex flex-wrap items-center gap-3">
-        <a
-          ref={link}
-          href="#"
-          onClick={(e) => e.preventDefault()}
-          draggable
-          className="btn btn-primary cursor-grab active:cursor-grabbing"
-          title={t('bookmarklet.drag')}
-        >
-          <Icon name="bookmark" size={18} />
-          {t('bookmarklet.button')}
-        </a>
-        <span className="text-sm text-muted">← {t('bookmarklet.drag')}</span>
-      </div>
-      <p className="mt-3 text-sm text-muted">{t('bookmarklet.mobile')}</p>
-    </div>
   );
 }
