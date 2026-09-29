@@ -404,7 +404,9 @@ function Chat({ video, provider, apiKey }: { video: AiVideo; provider: Provider;
                   <p className="font-semibold">{slow ? t('ai.slowTitle') : (progress ?? t('ai.thinking'))}</p>
                   {slow ? (
                     <>
-                      <p className="text-sm leading-snug text-muted">{t('ai.slowText', { provider: provider === 'gemini' ? 'Gemini' : 'ChatGPT' })}</p>
+                      <p className="text-sm leading-snug text-muted">
+                        {t('ai.slowText', { provider: provider === 'gemini' ? 'Gemini' : 'ChatGPT' })}
+                      </p>
                       <button type="button" className="link text-sm font-semibold" onClick={() => abort.current?.abort()}>
                         {t('ai.slowStop')}
                       </button>

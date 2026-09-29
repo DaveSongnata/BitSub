@@ -86,7 +86,8 @@ const Rows = memo(function Rows({
             className={cn(
               'relative grid gap-x-4 py-3 transition-colors duration-200',
               showTime ? 'grid-cols-[4.25rem_1fr] sm:grid-cols-[5rem_1fr]' : 'grid-cols-1',
-              i === playing && 'bg-[var(--bs-highlight)] before:absolute before:-left-4 before:top-0 before:bottom-0 before:w-1 before:bg-primary sm:before:-left-5'
+              i === playing &&
+                'bg-[var(--bs-highlight)] before:absolute before:-left-4 before:top-0 before:bottom-0 before:w-1 before:bg-primary sm:before:-left-5'
             )}
           >
             {showTime ? (
