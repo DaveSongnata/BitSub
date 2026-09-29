@@ -7,6 +7,7 @@
  *    so the text itself never passes through BitSub.
  */
 import { normalizeCues, type Cue } from '../transcript';
+import { fetchVideoInfoInBrowser } from './browser-player';
 
 export interface CaptionTrack {
   baseUrl: string;
@@ -137,8 +138,24 @@ async function withTimeout<T>(p: (signal: AbortSignal) => Promise<T>, signal?: A
   }
 }
 
+/**
+ * Caption list for a video: first from the visitor's own browser (no server, their IP),
+ * then from our relay if the browser path can't answer.
+ */
 export async function fetchVideoInfo(videoId: string, signal?: AbortSignal): Promise<VideoInfo> {
   if (!navigator.onLine) throw new TranscriptError('offline');
+  try {
+    const result = await fetchVideoInfoInBrowser(videoId, signal);
+    if (result.ok) return result.info;
+    throw new TranscriptError(result.code);
+  } catch (e) {
+    if (e instanceof TranscriptError || signal?.aborted) throw e;
+    // Browser path unavailable (YouTube changed something, flagged network…): use the relay.
+  }
+  return fetchVideoInfoFromRelay(videoId, signal);
+}
+
+async function fetchVideoInfoFromRelay(videoId: string, signal?: AbortSignal): Promise<VideoInfo> {
   let res: Response;
   try {
     res = await withTimeout(
