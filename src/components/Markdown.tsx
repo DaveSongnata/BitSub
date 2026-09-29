@@ -34,8 +34,10 @@ const PURIFY = {
   FORBID_ATTR: ['style', 'srcset'],
 };
 
-// [12:34] or [1:02:03] (also 12:34 inside (…)) → clickable seek buttons
-const TS_RE = /\[(\d{1,2}:\d{2}(?::\d{2})?)\]/g;
+// [12:34], [1:02:03] and groups like [11:37, 13:13] or [05:31 – 06:10] → one clickable button per time
+const TIME = String.raw`\d{1,2}:\d{2}(?::\d{2})?`;
+const TS_RE = new RegExp(String.raw`\[(${TIME}(?:\s*(?:[,;–-]|e|and|y)\s*${TIME})*)\]`, 'g');
+const ONE_TIME = new RegExp(TIME, 'g');
 
 function toSeconds(ts: string): number {
   return ts
@@ -47,7 +49,9 @@ function toSeconds(ts: string): number {
 function render(md: string, linkTimes: boolean): string {
   const html = marked.parse(md, { async: false });
   const withTimes = linkTimes
-    ? html.replace(TS_RE, (_m, ts: string) => `<button type="button" class="ts-link" data-t="${toSeconds(ts)}">${ts}</button>`)
+    ? html.replace(TS_RE, (_m, group: string) =>
+        group.replace(ONE_TIME, (ts) => `<button type="button" class="ts-link" data-t="${toSeconds(ts)}">${ts}</button>`)
+      )
     : html;
   return DOMPurify.sanitize(withTimes, PURIFY);
 }
