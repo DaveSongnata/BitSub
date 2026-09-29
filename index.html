@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>BitSub · Baixe a legenda de qualquer vídeo do YouTube</title>
+    <meta
+      name="description"
+      content="Cole um link do YouTube e baixe a legenda em TXT, TXT com tempo ou SRT. Grátis, sem anúncio e sem cadastro. Resuma e tire dúvidas com a sua IA."
+    />
+    <meta name="theme-color" content="#ffecd6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d2b45" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="application-name" content="BitSub" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="BitSub" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="BitSub" />
+    <meta property="og:title" content="BitSub · Legendas do YouTube, sem enrolação" />
+    <meta property="og:description" content="Cole um link, leia e baixe a legenda (TXT, com tempo, SRT). Resuma com a sua IA. Grátis, sem anúncio e sem cadastro." />
+    <meta property="og:image" content="https://bitsub.vercel.app/og/og-pt-BR.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale:alternate" content="es_LA" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/icons/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/icons/favicon-16.png" sizes="16x16" type="image/png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "BitSub",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "inLanguage": ["pt-BR", "en", "es"],
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" },
+        "description": "Baixe legendas e transcrições de vídeos do YouTube (TXT, TXT com tempo, SRT, VTT) e resuma com a sua própria IA. Tudo no navegador."
+      }
+    </script>
+
+    <!-- Apply theme before the first paint (no flash) -->
+    <script>
+      (function () {
+        try {
+          var s = JSON.parse(localStorage.getItem('bitsub-settings') || '{}');
+          var theme = s.theme || 'slso8';
+          var mode = s.mode || 'system';
+          var dark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          var root = document.documentElement;
+          root.setAttribute('data-theme', theme);
+          root.setAttribute('data-mode', mode);
+          if (dark) root.classList.add('dark');
+          var lang = localStorage.getItem('bitsub-language');
+          if (lang) root.lang = lang;
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <div style="font-family: system-ui, sans-serif; max-width: 36rem; margin: 3rem auto; padding: 0 1rem; line-height: 1.5">
+        <h1>BitSub</h1>
+        <p>O BitSub precisa de JavaScript ligado para funcionar. · BitSub needs JavaScript to work. · BitSub necesita JavaScript para funcionar.</p>
+      </div>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
