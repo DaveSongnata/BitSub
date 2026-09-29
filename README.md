@@ -43,7 +43,7 @@ O texto da legenda, a chave da IA e as conversas nunca passam por servidor do Bi
 2. Na Vercel: **Add New → Project**, escolha o repositório. Ela detecta Vite sozinha (`vercel.json` já configura tudo). Clique em **Deploy**.
 3. Depois do deploy, confira se o YouTube responde para o servidor:
    `https://bitsub.treent.com.br/api/tracks?v=dQw4w9WgXcQ&diag=1`
-   Algum cliente com `"result": "ok"` = tudo certo. Se todos vierem `"blocked"`, troque a região da função (Settings → Functions → Function Region, ex.: `gru1` São Paulo ou `cdg1` Paris), faça redeploy e teste de novo. Mesmo bloqueado, o plano B (botão de favoritos e colar texto) continua funcionando.
+   Isso testa só o servidor de reserva. Se vier `"blocked"`, tudo bem: o caminho principal roda no navegador de cada pessoa, e o botão de favoritos e o "colar texto" continuam como plano B.
 
 Não precisa de variável de ambiente nem de banco de dados.
 
