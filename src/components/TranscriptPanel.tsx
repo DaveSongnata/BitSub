@@ -1,7 +1,7 @@
 import { memo, useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { exportTranscript, formatClock, toParagraphs, toTimedBlocks, type Block, type Cue } from '@/lib/transcript';
-import { seek } from '@/lib/player';
+import { seek, usePlayerTime } from '@/lib/player';
 import { copyText } from '@/lib/files';
 import { toast } from '@/lib/toast';
 import { updateSettings, useSettings } from '@/lib/settings';
@@ -59,6 +59,7 @@ const Rows = memo(function Rows({
   showTime,
   query,
   active,
+  playing,
   long,
   jumpLabel,
 }: {
@@ -66,6 +67,7 @@ const Rows = memo(function Rows({
   showTime: boolean;
   query: string;
   active: number;
+  playing: number;
   long: boolean;
   jumpLabel: (time: string) => string;
 }) {
@@ -79,13 +81,22 @@ const Rows = memo(function Rows({
         return (
           <li
             key={i}
-            className={cn('grid gap-x-4 py-3', showTime ? 'grid-cols-[4.25rem_1fr] sm:grid-cols-[5rem_1fr]' : 'grid-cols-1')}
+            data-row={i}
+            aria-current={i === playing ? 'true' : undefined}
+            className={cn(
+              'relative grid gap-x-4 py-3 transition-colors duration-200',
+              showTime ? 'grid-cols-[4.25rem_1fr] sm:grid-cols-[5rem_1fr]' : 'grid-cols-1',
+              i === playing && 'bg-[var(--bs-highlight)] before:absolute before:-left-4 before:top-0 before:bottom-0 before:w-1 before:bg-primary sm:before:-left-5'
+            )}
           >
             {showTime ? (
               <button
                 type="button"
                 onClick={() => seek(b.start)}
-                className="h-fit self-start justify-self-start px-1 py-0.5 font-mono text-[0.85rem] tnum text-muted underline decoration-primary decoration-2 underline-offset-4 hover:bg-primary hover:text-on-primary hover:no-underline"
+                className={cn(
+                  'h-fit self-start justify-self-start px-1 py-0.5 font-mono text-[0.85rem] tnum underline decoration-primary decoration-2 underline-offset-4 hover:bg-primary hover:text-on-primary hover:no-underline',
+                  i === playing ? 'bg-primary font-semibold text-on-primary no-underline' : 'text-muted'
+                )}
                 aria-label={jumpLabel(time)}
                 title={jumpLabel(time)}
               >
@@ -108,9 +119,41 @@ export function TranscriptPanel({ cues, title, url }: { cues: Cue[]; title: stri
   const deferred = useDeferredValue(query.trim());
   const [active, setActive] = useState(0);
   const listRef = useRef<HTMLDivElement>(null);
+  const playerTime = usePlayerTime();
 
   const blocks = useMemo(() => (showTime ? toTimedBlocks(cues) : toParagraphs(cues)), [cues, showTime]);
   const long = (cues[cues.length - 1]?.end ?? 0) >= 3600;
+
+  // Block being played right now (last block that started before the player's time)
+  const playing = useMemo(() => {
+    if (playerTime === null) return -1;
+    let lo = 0;
+    let hi = blocks.length - 1;
+    let found = -1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      if (blocks[mid]!.start <= playerTime + 0.25) {
+        found = mid;
+        lo = mid + 1;
+      } else hi = mid - 1;
+    }
+    return found;
+  }, [blocks, playerTime]);
+
+  // Follow the video only while the person is looking at the playing part (never hijack their scroll).
+  const lastPlaying = useRef(-1);
+  useEffect(() => {
+    const prev = lastPlaying.current;
+    lastPlaying.current = playing;
+    if (playing < 0 || playing === prev || deferred) return;
+    const list = listRef.current;
+    const prevRow = list?.querySelector<HTMLElement>(`[data-row="${prev}"]`);
+    const row = list?.querySelector<HTMLElement>(`[data-row="${playing}"]`);
+    if (!row || !prevRow) return;
+    const r = prevRow.getBoundingClientRect();
+    const visible = r.bottom > 0 && r.top < window.innerHeight;
+    if (visible) row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }, [playing, deferred]);
 
   const total = useMemo(() => {
     if (!deferred) return 0;
@@ -190,6 +233,7 @@ export function TranscriptPanel({ cues, title, url }: { cues: Cue[]; title: stri
               showTime={showTime}
               query={deferred}
               active={active}
+              playing={playing}
               long={long}
               jumpLabel={(time) => t('transcript.jumpTo', { time })}
             />
