@@ -15,7 +15,16 @@ const STEP = 2.6;
 const EYE_SHAPE = 'polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%)';
 const GREETED_KEY = 'bitsub-greeted';
 
-export function InteractiveMascot({ size = 200, className }: { size?: number; className?: string }) {
+export function InteractiveMascot({
+  size = 200,
+  className,
+  bubbleSide = 'right',
+}: {
+  size?: number;
+  className?: string;
+  /** Where the speech bubble opens (use 'left' when the robot sits at the right edge) */
+  bubbleSide?: 'left' | 'right';
+}) {
   const { t } = useTranslation();
   const phrases = t('home.mascotSays', { returnObjects: true }) as unknown as string[];
   const wrap = useRef<HTMLButtonElement>(null);
@@ -126,12 +135,21 @@ export function InteractiveMascot({ size = 200, className }: { size?: number; cl
       {bubble ? (
         <span
           role="status"
-          className="absolute bottom-[88%] left-[62%] z-10 w-max max-w-[15rem] border-2 border-[#0d2b45] bg-[#ffecd6] px-3 py-2 text-left text-[0.95rem] font-semibold leading-snug text-[#0d2b45] shadow-[3px_3px_0_0_#0d2b45] animate-rise"
+          className={cn(
+            'absolute bottom-[88%] z-10 w-max',
+            bubbleSide === 'right' ? 'left-[62%]' : 'right-[62%]',
+            ' max-w-[15rem] border-2 border-[#0d2b45] bg-[#ffecd6] px-3 py-2 text-left text-[0.95rem] font-semibold leading-snug text-[#0d2b45] shadow-[3px_3px_0_0_#0d2b45] animate-rise'
+          )}
         >
           {bubble}
           <span
             aria-hidden
-            className="absolute -bottom-[10px] left-3 h-[10px] w-[10px] border-b-2 border-l-2 border-[#0d2b45] bg-[#ffecd6] [clip-path:polygon(0_0,100%_0,0_100%)]"
+            className={cn(
+              'absolute -bottom-[10px] h-[10px] w-[10px] border-b-2 border-[#0d2b45] bg-[#ffecd6]',
+              bubbleSide === 'right'
+                ? 'left-3 border-l-2 [clip-path:polygon(0_0,100%_0,0_100%)]'
+                : 'right-3 border-r-2 [clip-path:polygon(0_0,100%_0,100%_100%)]'
+            )}
           />
         </span>
       ) : null}
