@@ -327,9 +327,73 @@ async function mascotEyes() {
   console.log('wrote src/assets/mascot-eyes.json', JSON.stringify(meta));
 }
 
+/** Pixel-art cursors (arrow + hand), 1x and 2x, orange with a navy outline. */
+async function cursors() {
+  const ART = {
+    arrow: [
+      'X...........',
+      'XX..........',
+      'XOX.........',
+      'XOOX........',
+      'XOOOX.......',
+      'XOOOOX......',
+      'XOOOOOX.....',
+      'XOOOOOOX....',
+      'XOOOOOOOX...',
+      'XOOOOOOOOX..',
+      'XOOOOOOOOOX.',
+      'XOOOOOOXXXXX',
+      'XOOOXOOX....',
+      'XOOX.XOOX...',
+      'XOX..XOOX...',
+      'XX....XOOX..',
+      'X.....XOOX..',
+      '.......XX...',
+    ],
+    hand: [
+      '.....XX.........',
+      '....XOOX........',
+      '....XOOX........',
+      '....XOOX........',
+      '....XOOXXX......',
+      '....XOOXOOXXX...',
+      '.XX.XOOXOOXOOXX.',
+      'XOOXXOOOOOOOOOX.',
+      'XOOOXOOOOOOOOOX.',
+      '.XOOOOOOOOOOOOX.',
+      '..XOOOOOOOOOOOX.',
+      '..XOOOOOOOOOOX..',
+      '...XOOOOOOOOOX..',
+      '...XOOOOOOOOX...',
+      '....XOOOOOOOX...',
+      '....XXXXXXXXX...',
+    ],
+  };
+  const COLORS = { X: [13, 43, 69, 255], O: [255, 170, 94, 255], '.': [0, 0, 0, 0] };
+  mkdirSync('public/cursors', { recursive: true });
+  for (const [name, rows] of Object.entries(ART)) {
+    const cols = Math.max(...rows.map((r) => r.length));
+    for (const [suffix, scale] of [['', 2], ['@2x', 4]]) {
+      const w = cols * scale;
+      const h = rows.length * scale;
+      const buf = Buffer.alloc(w * h * 4);
+      rows.forEach((row, y) =>
+        [...row.padEnd(cols, '.')].forEach((ch, x) => {
+          const c = COLORS[ch] ?? COLORS['.'];
+          for (let dy = 0; dy < scale; dy++)
+            for (let dx = 0; dx < scale; dx++) buf.set(c, ((y * scale + dy) * w + x * scale + dx) * 4);
+        })
+      );
+      await sharp(buf, { raw: { width: w, height: h, channels: 4 } }).png().toFile(`public/cursors/${name}${suffix}.png`);
+    }
+    console.log('wrote cursor', name);
+  }
+}
+
 mkdirSync('src/assets', { recursive: true });
 await sprite('bitsub-mascot.png', 'public/illustrations/mascot.png', 512);
 await mascotEyes();
+await cursors();
 if (existsSync(SRC + 'state-ai-thinking.png')) await thinking();
 await icons();
 await favicon();
