@@ -263,15 +263,6 @@ const ptBR = {
     tooShort: 'Esse texto está muito curtinho. Cola o texto completo?',
     pastedTitle: 'Texto colado',
   },
-  bookmarklet: {
-    title: 'Plano B: botão BitSub',
-    text: 'Se o YouTube não responder pra gente, esse botão pega a legenda direto da página do YouTube, usando a sua própria conexão. Nada passa por servidor nenhum.',
-    button: 'BitSub',
-    drag: 'Arraste para a barra de favoritos. Depois, num vídeo do YouTube, clique nele.',
-    mobile: 'Funciona no computador (Chrome, Edge, Firefox, Safari).',
-    open: 'Abra um vídeo do YouTube e clique no botão BitSub de novo.',
-    fail: 'Não deu pra pegar a legenda desse vídeo. Tenta recarregar a página do YouTube.',
-  },
   tutorial: {
     title: 'Como pegar sua chave do {{provider}}',
     subtitle: 'Leva uns 2 minutos. Você só faz isso uma vez.',

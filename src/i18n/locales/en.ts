@@ -265,15 +265,6 @@ const en: Messages = {
     tooShort: 'This text is too short. Can you paste the whole thing?',
     pastedTitle: 'Pasted text',
   },
-  bookmarklet: {
-    title: 'Plan B: the BitSub button',
-    text: "If YouTube won't answer us, this button grabs the subtitles straight from the YouTube page, using your own connection. Nothing goes through any server.",
-    button: 'BitSub',
-    drag: 'Drag it to your bookmarks bar. Then, on a YouTube video, click it.',
-    mobile: 'Works on computers (Chrome, Edge, Firefox, Safari).',
-    open: 'Open a YouTube video and click the BitSub button again.',
-    fail: "We couldn't get this video's subtitles. Try reloading the YouTube page.",
-  },
   tutorial: {
     title: 'How to get your {{provider}} key',
     subtitle: 'Takes about 2 minutes. You only do it once.',

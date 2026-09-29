@@ -271,15 +271,6 @@ const es: Messages = {
     tooShort: 'Este texto es muy cortito. ¿Pegas el texto completo?',
     pastedTitle: 'Texto pegado',
   },
-  bookmarklet: {
-    title: 'Plan B: el botón BitSub',
-    text: 'Si YouTube no nos responde, este botón toma los subtítulos directo de la página de YouTube, con tu propia conexión. Nada pasa por ningún servidor.',
-    button: 'BitSub',
-    drag: 'Arrástralo a tu barra de favoritos. Luego, en un video de YouTube, haz clic en él.',
-    mobile: 'Funciona en computadora (Chrome, Edge, Firefox, Safari).',
-    open: 'Abre un video de YouTube y vuelve a hacer clic en el botón BitSub.',
-    fail: 'No pudimos obtener los subtítulos de este video. Intenta recargar la página de YouTube.',
-  },
   tutorial: {
     title: 'Cómo obtener tu clave de {{provider}}',
     subtitle: 'Toma unos 2 minutos. Solo lo haces una vez.',
