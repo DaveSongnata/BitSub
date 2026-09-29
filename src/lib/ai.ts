@@ -41,7 +41,7 @@ export const PROVIDERS: Record<
     name: 'Gemini',
     keyUrl: 'https://aistudio.google.com/apikey',
     billingUrl: 'https://aistudio.google.com/usage',
-    usageUrl: 'https://aistudio.google.com/usage',
+    usageUrl: 'https://aistudio.google.com/api-keys',
     free: true,
     defaultModel: 'gemini-3.5-flash-lite',
     preferred: [
