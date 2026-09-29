@@ -125,6 +125,16 @@ function Chat({ video, provider, apiKey }: { video: AiVideo; provider: Provider;
   const scroller = useRef<HTMLDivElement>(null);
   const touched = useRef(false);
   const busy = streaming !== null;
+  const waitingFirstWord = busy && !streaming;
+  const [slow, setSlow] = useState(false);
+
+  // No first word after a while: tell the person instead of leaving them guessing.
+  useEffect(() => {
+    setSlow(false);
+    if (!waitingFirstWord) return;
+    const timer = setTimeout(() => setSlow(true), 12000);
+    return () => clearTimeout(timer);
+  }, [waitingFirstWord]);
 
   // Load the saved conversation for this video
   useEffect(() => {
@@ -390,7 +400,17 @@ function Chat({ video, provider, apiKey }: { video: AiVideo; provider: Provider;
             ) : (
               <div className="flex items-center gap-4 border-2 border-line bg-surface-alt p-3">
                 <ThinkingMascot size={96} />
-                <p className="font-semibold">{progress ?? t('ai.thinking')}</p>
+                <div className="min-w-0 space-y-1.5" aria-live="polite">
+                  <p className="font-semibold">{slow ? t('ai.slowTitle') : (progress ?? t('ai.thinking'))}</p>
+                  {slow ? (
+                    <>
+                      <p className="text-sm leading-snug text-muted">{t('ai.slowText', { provider: provider === 'gemini' ? 'Gemini' : 'ChatGPT' })}</p>
+                      <button type="button" className="link text-sm font-semibold" onClick={() => abort.current?.abort()}>
+                        {t('ai.slowStop')}
+                      </button>
+                    </>
+                  ) : null}
+                </div>
               </div>
             )}
           </article>
