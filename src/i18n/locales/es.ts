@@ -107,7 +107,7 @@ const es: Messages = {
       },
       {
         q: '¿Guardan mis datos?',
-        a: 'No. Tu historial y tu clave se quedan en tu navegador. Para encontrar la lista de subtítulos de un video, BitSub le pregunta a YouTube usando solo el código del video, sin nada tuyo. El texto de los subtítulos llega directo de YouTube a tu dispositivo.',
+        a: 'No. BitSub no tiene servidor: es tu propio navegador el que le pide los subtítulos a YouTube, sin iniciar sesión y sin nada tuyo. Tu historial y tu clave de IA se quedan solo en este dispositivo.',
       },
     ],
   },

@@ -99,7 +99,7 @@ const ptBR = {
       },
       {
         q: 'Vocês guardam meus dados?',
-        a: 'Não. Seu histórico e sua chave ficam no seu navegador. Pra achar a lista de legendas de um vídeo, o BitSub pergunta ao YouTube usando só o código do vídeo, sem nada seu junto. O texto da legenda vem direto do YouTube pro seu aparelho.',
+        a: 'Não. O BitSub não tem servidor: é o seu próprio navegador que pede a legenda ao YouTube, sem login e sem nada seu junto. Seu histórico e sua chave da IA ficam só neste aparelho.',
       },
     ],
   },

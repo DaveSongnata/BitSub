@@ -101,7 +101,7 @@ const en: Messages = {
       },
       {
         q: 'Do you store my data?',
-        a: "No. Your history and your key stay in your browser. To find a video's subtitle list, BitSub asks YouTube using only the video's ID, with nothing of yours attached. The subtitle text comes straight from YouTube to your device.",
+        a: 'No. BitSub has no server: your own browser asks YouTube for the subtitles, without logging in and with nothing of yours attached. Your history and your AI key stay on this device only.',
       },
     ],
   },
