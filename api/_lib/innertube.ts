@@ -216,6 +216,8 @@ interface Outcome {
   result: 'ok' | 'no_captions' | 'po_required' | RelayErrorCode;
   tracks?: number;
   ms: number;
+  /** Why it failed (diagnostics only) */
+  detail?: string;
   video?: RelayVideo;
 }
 
@@ -226,7 +228,8 @@ async function tryClient(videoId: string, client: ClientProfile, signal: AbortSi
   try {
     p = await callPlayer(videoId, client, signal);
   } catch (e) {
-    return done({ result: e instanceof RelayError ? e.code : 'unknown' });
+    const detail = e instanceof Error ? `${e.name}: ${e.message}`.slice(0, 160) : String(e);
+    return done({ result: e instanceof RelayError ? e.code : 'unknown', detail });
   }
   const problem = classify(p);
   if (problem) return done({ result: problem });
