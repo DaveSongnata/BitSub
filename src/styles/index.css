@@ -630,6 +630,22 @@
     drop-shadow(0 1px 0 rgb(255 236 214 / 0.35)) drop-shadow(0 -1px 0 rgb(255 236 214 / 0.35));
 }
 
+/* Landing robot saying hi: a little 8-bit hop */
+@keyframes mascot-hop {
+  0% {
+    transform: none;
+  }
+  33% {
+    transform: translateY(-9%);
+  }
+  66% {
+    transform: translateY(-4%);
+  }
+  100% {
+    transform: none;
+  }
+}
+
 /* Thinking robot: dots light up in turn, the robot bobs a pixel (see ThinkingMascot) */
 @keyframes think-dot {
   0% {
