@@ -1,5 +1,5 @@
 /**
- * Loads a video's transcript: history cache → relay (or bookmarklet import) → YouTube captions.
+ * Loads a video's transcript: history cache → caption list (visitor's browser) → caption text.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -37,66 +37,6 @@ export type VideoState =
   | { status: 'loading'; phase: Phase; videoId: string; title?: string }
   | { status: 'ready'; video: LoadedVideo; notice: Notice; info: VideoInfo | null }
   | { status: 'error'; error: FetchErrorCode | 'playlist'; videoId: string; title?: string };
-
-/** Payload handed over by the "BitSub button" bookmarklet (runs on youtube.com). */
-interface ImportPayload {
-  v: string;
-  t?: string;
-  a?: string;
-  l?: number;
-  k?: [string, string, number, number][];
-  x?: string[];
-}
-
-const str = (v: unknown, max = 300): string => (typeof v === 'string' ? v.slice(0, max) : '');
-const LANG_RE = /^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/;
-
-/** Only real YouTube caption URLs are accepted from the hand-off (never another host). */
-function safeCaptionUrl(raw: unknown): string | null {
-  if (typeof raw !== 'string') return null;
-  try {
-    const u = new URL(raw, 'https://www.youtube.com');
-    if (u.protocol !== 'https:' || u.hostname !== 'www.youtube.com' || u.pathname !== '/api/timedtext') return null;
-    if (/[?&]exp=xpe/.test(u.search)) return null; // needs a token we don't have
-    u.searchParams.delete('fmt');
-    return u.toString();
-  } catch {
-    return null;
-  }
-}
-
-// Parsed once per video, so later re-renders (or dev StrictMode) still see it after the URL is cleaned.
-const imported = new Map<string, VideoInfo>();
-
-export function readImportHash(videoId: string): VideoInfo | null {
-  const m = /[#&]yt=([^&]+)/.exec(window.location.hash);
-  if (!m?.[1]) return imported.get(videoId) ?? null;
-  try {
-    const p = JSON.parse(decodeURIComponent(m[1])) as ImportPayload;
-    if (!p || p.v !== videoId || !Array.isArray(p.k)) return null;
-    const tracks: VideoInfo['tracks'] = [];
-    for (const k of p.k.slice(0, 100)) {
-      if (!Array.isArray(k)) continue;
-      const url = safeCaptionUrl(k[0]);
-      const lang = str(k[1], 20);
-      if (!url || !LANG_RE.test(lang)) continue;
-      tracks.push({ baseUrl: url, languageCode: lang, name: lang, kind: k[2] ? 'asr' : 'manual', isTranslatable: k[3] !== 0 });
-    }
-    const info: VideoInfo = {
-      videoId,
-      title: str(p.t),
-      author: str(p.a, 120),
-      lengthSeconds: typeof p.l === 'number' && Number.isFinite(p.l) ? Math.max(0, p.l) : 0,
-      isLive: false,
-      tracks,
-      translationLanguages: Array.isArray(p.x) ? p.x.filter((x): x is string => typeof x === 'string' && LANG_RE.test(x)) : [],
-    };
-    if (tracks.length) imported.set(videoId, info);
-    return info;
-  } catch {
-    return null;
-  }
-}
 
 /** Signed caption URLs expire after a few hours; don't reuse a list older than this. */
 const INFO_MAX_AGE = 45 * 60 * 1000;
@@ -138,8 +78,6 @@ export function useVideo(videoId: string | null, requested: string) {
       if (!cancelled) setState(s);
     };
 
-    // Read the bookmarklet hand-off now, before anything rewrites the URL.
-    const hashInfo = readImportHash(videoId);
     // Show "loading" right away instead of the previous video while IndexedDB answers.
     setState((s) =>
       s && (s.status === 'loading' ? s.videoId : s.status === 'error' ? s.videoId : s.video.videoId) === videoId ? s : null
@@ -148,7 +86,7 @@ export function useVideo(videoId: string | null, requested: string) {
     void (async () => {
       // 1. History (instant, works offline)
       const saved = await db.videos.get(videoId).catch(() => undefined);
-      if (saved && saved.cues.length && saved.requested === requested && !hashInfo && attempt === 0) {
+      if (saved && saved.cues.length && saved.requested === requested && attempt === 0) {
         set({ status: 'ready', video: saved, notice: null, info: null });
         if (getSettings().saveHistory) void db.videos.update(videoId, { openedAt: Date.now() }).catch(() => undefined);
         return;
@@ -156,15 +94,13 @@ export function useVideo(videoId: string | null, requested: string) {
 
       set({ status: 'loading', phase: 'finding', videoId, title: saved?.title });
       try {
-        // 2. Caption list (bookmarklet hand-off, memory, or relay)
+        // 2. Caption list (memory, or asked by the browser)
         let info: VideoInfo;
         const cachedInfo = infoRef.current;
         const fresh = cachedInfo?.id === videoId && attempt === 0 && Date.now() - cachedInfo.at < INFO_MAX_AGE;
-        if (hashInfo?.tracks.length) info = hashInfo;
-        else if (fresh && cachedInfo) info = cachedInfo.info;
+        if (fresh && cachedInfo) info = cachedInfo.info;
         else info = await fetchVideoInfo(videoId, ctrl.signal);
         infoRef.current = { id: videoId, info, at: fresh && cachedInfo ? cachedInfo.at : Date.now() };
-        if (hashInfo) window.history.replaceState(null, '', window.location.pathname + window.location.search);
 
         const sel = selectTrack(info, requested);
         if (!sel) throw new TranscriptError('no_captions');
