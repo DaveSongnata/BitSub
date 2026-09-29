@@ -259,7 +259,7 @@ export async function getVideo(videoId: string, signal: AbortSignal): Promise<Re
   const hard: RelayErrorCode[] = [];
   let noCaptions: RelayVideo | null = null;
   let noCaptionAnswers = 0;
-  let sawBlock = false;
+  let blocks = 0;
   let sawRateLimit = false;
   let sawTokenWall = false;
 
@@ -274,8 +274,11 @@ export async function getVideo(videoId: string, signal: AbortSignal): Promise<Re
       continue;
     }
     if (o.result === 'po_required') sawTokenWall = true;
-    else if (o.result === 'blocked') sawBlock = true;
-    else if (o.result === 'rate_limited') sawRateLimit = true;
+    else if (o.result === 'blocked') {
+      // All clients leave from the same server IP: once two are blocked, the rest will be too.
+      // Stopping early keeps this IP's reputation from getting worse.
+      if (++blocks >= 2) break;
+    } else if (o.result === 'rate_limited') sawRateLimit = true;
     else if (o.result !== 'unknown' && o.result !== 'no_captions' && o.result !== 'ok') {
       hard.push(o.result as RelayErrorCode);
       // Two clients agreeing about the video itself (private, removed…) settles it.
@@ -291,6 +294,6 @@ export async function getVideo(videoId: string, signal: AbortSignal): Promise<Re
   }
   if (hard[0]) throw new RelayError(hard[0]);
   if (sawRateLimit) throw new RelayError('rate_limited');
-  if (sawBlock) throw new RelayError('blocked');
+  if (blocks) throw new RelayError('blocked');
   throw new RelayError('unknown');
 }
