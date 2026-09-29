@@ -35,7 +35,10 @@ const nearest = (r, g, b) => {
 
 /** Transparent sprite: snap colors to SLSO8, hard alpha, remove white/near-white backdrop, trim, pad. */
 async function sprite(file, out, size, hook) {
-  const { data, info } = await sharp(SRC + file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const { data, info } = await sharp(SRC + file)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
   const { width: w, height: h } = info;
   // Backdrop removal by flood fill from the borders (handles a white or checkerboard-free light backdrop)
   const isBackdrop = (i) => data[i + 3] < 128 || (data[i] > 235 && data[i + 1] > 235 && data[i + 2] > 235);
@@ -56,7 +59,10 @@ async function sprite(file, out, size, hook) {
     if (y > 0) stack.push(p - w);
     if (y < h - 1) stack.push(p + w);
   }
-  let minX = w, minY = h, maxX = 0, maxY = 0;
+  let minX = w,
+    minY = h,
+    maxX = 0,
+    maxY = 0;
   for (let p = 0; p < w * h; p++) {
     const i = p * 4;
     if (data[i + 3] < 128) {
@@ -142,13 +148,19 @@ async function icons() {
   }
   const scale = 0.78;
   const fw = Math.round(w * scale);
-  const art = await sharp(fg, { raw: { width: w, height: h, channels: 4 } }).resize(fw, fw, { kernel: 'lanczos3' }).png().toBuffer();
+  const art = await sharp(fg, { raw: { width: w, height: h, channels: 4 } })
+    .resize(fw, fw, { kernel: 'lanczos3' })
+    .png()
+    .toBuffer();
   const maskable = await sharp(bg, { raw: { width: w, height: h, channels: 3 } })
     .composite([{ input: art, left: Math.round((w - fw) / 2), top: Math.round((h - fw) / 2) }])
     .png()
     .toBuffer();
   for (const size of [512, 192]) {
-    await sharp(maskable).resize(size, size, { kernel: 'lanczos3' }).png({ compressionLevel: 9 }).toFile(`public/icons/icon-maskable-${size}.png`);
+    await sharp(maskable)
+      .resize(size, size, { kernel: 'lanczos3' })
+      .png({ compressionLevel: 9 })
+      .toFile(`public/icons/icon-maskable-${size}.png`);
     console.log('wrote', `icon-maskable-${size}.png`);
   }
 }
@@ -181,7 +193,10 @@ async function favicon() {
   const src = sharp(SRC + 'bitsub-favicon-master.png').removeAlpha();
   const { width: w } = await src.metadata();
   const crop = Math.round(w * 0.18);
-  const base = await src.extract({ left: crop, top: crop, width: w - crop * 2, height: w - crop * 2 }).png().toBuffer();
+  const base = await src
+    .extract({ left: crop, top: crop, width: w - crop * 2, height: w - crop * 2 })
+    .png()
+    .toBuffer();
   const out = [];
   for (const size of [16, 32, 48]) {
     const buf = await sharp(base).resize(size, size, { kernel: 'lanczos3' }).png({ compressionLevel: 9 }).toBuffer();
@@ -201,7 +216,8 @@ async function thinking() {
   const out = 'public/illustrations/ai-thinking.png';
   await sprite(file, out, 512, (data, w, h) => {
     const ORANGE = SLSO8[2];
-    const isOrange = (p) => data[p * 4 + 3] === 255 && data[p * 4] === ORANGE[0] && data[p * 4 + 1] === ORANGE[1] && data[p * 4 + 2] === ORANGE[2];
+    const isOrange = (p) =>
+      data[p * 4 + 3] === 255 && data[p * 4] === ORANGE[0] && data[p * 4 + 1] === ORANGE[1] && data[p * 4 + 2] === ORANGE[2];
     const seen = new Uint8Array(w * h);
     const dots = [];
     for (let p = 0; p < w * h; p++) {
@@ -222,11 +238,17 @@ async function thinking() {
           }
         }
       }
-      let x0 = w, y0 = h, x1 = 0, y1 = 0;
+      let x0 = w,
+        y0 = h,
+        x1 = 0,
+        y1 = 0;
       for (const q of blob) {
         const x = q % w;
         const y = (q / w) | 0;
-        x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+        x0 = Math.min(x0, x);
+        x1 = Math.max(x1, x);
+        y0 = Math.min(y0, y);
+        y1 = Math.max(y1, y);
       }
       // A dot sits inside the bubble: the ring around it is a single light color (the bubble), not the navy outline.
       const ring = [];
@@ -243,7 +265,10 @@ async function thinking() {
       const light = new Set(['255,236,214', '255,212,163']); // cream, peach (the bubble)
       const onlyBubble = [...counts.keys()].every((k) => light.has(k));
       if (onlyBubble && blob.length > 50) {
-        const fill = [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0].split(',').map(Number);
+        const fill = [...counts.entries()]
+          .sort((a, b) => b[1] - a[1])[0][0]
+          .split(',')
+          .map(Number);
         dots.push({ x0, y0, x1, y1, fill });
       }
     }
@@ -268,7 +293,8 @@ async function thinking() {
 
 /** Connected blobs of one exact color (4-neighbour flood fill). */
 function blobs(data, w, h, color) {
-  const is = (p) => data[p * 4 + 3] === 255 && data[p * 4] === color[0] && data[p * 4 + 1] === color[1] && data[p * 4 + 2] === color[2];
+  const is = (p) =>
+    data[p * 4 + 3] === 255 && data[p * 4] === color[0] && data[p * 4 + 1] === color[1] && data[p * 4 + 2] === color[2];
   const seen = new Uint8Array(w * h);
   const out = [];
   for (let p = 0; p < w * h; p++) {
@@ -276,13 +302,19 @@ function blobs(data, w, h, color) {
     const pixels = [];
     const stack = [p];
     seen[p] = 1;
-    let x0 = w, y0 = h, x1 = 0, y1 = 0;
+    let x0 = w,
+      y0 = h,
+      x1 = 0,
+      y1 = 0;
     while (stack.length) {
       const q = stack.pop();
       pixels.push(q);
       const x = q % w;
       const y = (q / w) | 0;
-      x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+      x0 = Math.min(x0, x);
+      x1 = Math.max(x1, x);
+      y0 = Math.min(y0, y);
+      y1 = Math.max(y1, y);
       for (const n of [x > 0 ? q - 1 : -1, x < w - 1 ? q + 1 : -1, y > 0 ? q - w : -1, y < h - 1 ? q + w : -1]) {
         if (n >= 0 && !seen[n] && is(n)) {
           seen[n] = 1;
@@ -373,7 +405,10 @@ async function cursors() {
   mkdirSync('public/cursors', { recursive: true });
   for (const [name, rows] of Object.entries(ART)) {
     const cols = Math.max(...rows.map((r) => r.length));
-    for (const [suffix, scale] of [['', 2], ['@2x', 4]]) {
+    for (const [suffix, scale] of [
+      ['', 2],
+      ['@2x', 4],
+    ]) {
       const w = cols * scale;
       const h = rows.length * scale;
       const buf = Buffer.alloc(w * h * 4);
@@ -384,7 +419,9 @@ async function cursors() {
             for (let dx = 0; dx < scale; dx++) buf.set(c, ((y * scale + dy) * w + x * scale + dx) * 4);
         })
       );
-      await sharp(buf, { raw: { width: w, height: h, channels: 4 } }).png().toFile(`public/cursors/${name}${suffix}.png`);
+      await sharp(buf, { raw: { width: w, height: h, channels: 4 } })
+        .png()
+        .toFile(`public/cursors/${name}${suffix}.png`);
     }
     console.log('wrote cursor', name);
   }

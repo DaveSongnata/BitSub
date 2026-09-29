@@ -14,12 +14,9 @@ const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 
  * so local development behaves exactly like production.
  */
 function vercelApiDev(): Plugin {
-  const handle = (server: Pick<ViteDevServer, 'ssrLoadModule'> | null) =>
-    async (
-      req: import('node:http').IncomingMessage,
-      res: import('node:http').ServerResponse,
-      next: () => void
-    ) => {
+  const handle =
+    (server: Pick<ViteDevServer, 'ssrLoadModule'> | null) =>
+    async (req: import('node:http').IncomingMessage, res: import('node:http').ServerResponse, next: () => void) => {
       const url = new URL(req.url ?? '/', 'http://localhost');
       const match = /^\/api\/([a-z-]+)$/.exec(url.pathname);
       if (!match || !server) return next();

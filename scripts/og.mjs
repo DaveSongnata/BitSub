@@ -5,14 +5,33 @@
 import { mkdirSync, readFileSync } from 'node:fs';
 import { chromium } from '@playwright/test';
 
-const font = readFileSync('node_modules/@fontsource-variable/instrument-sans/files/instrument-sans-latin-wght-normal.woff2').toString('base64');
-const pixel = readFileSync('node_modules/@fontsource/press-start-2p/files/press-start-2p-latin-400-normal.woff2').toString('base64');
+const font = readFileSync(
+  'node_modules/@fontsource-variable/instrument-sans/files/instrument-sans-latin-wght-normal.woff2'
+).toString('base64');
+const pixel = readFileSync('node_modules/@fontsource/press-start-2p/files/press-start-2p-latin-400-normal.woff2').toString(
+  'base64'
+);
 const icon = readFileSync('public/illustrations/mascot.png').toString('base64');
 
 const COPY = {
-  'pt-BR': { h: 'O que o vídeo fala, em texto.', a: 'Em segundos.', s: 'Legendas do YouTube em TXT, com tempo ou SRT. Resumo com a sua IA.', b: 'Grátis · Sem anúncio · Sem cadastro' },
-  en: { h: 'What the video says, as text.', a: 'In seconds.', s: 'YouTube subtitles as TXT, with time or SRT. Summaries with your own AI.', b: 'Free · No ads · No sign-up' },
-  es: { h: 'Lo que dice el video, en texto.', a: 'En segundos.', s: 'Subtítulos de YouTube en TXT, con tiempo o SRT. Resumen con tu propia IA.', b: 'Gratis · Sin anuncios · Sin registro' },
+  'pt-BR': {
+    h: 'O que o vídeo fala, em texto.',
+    a: 'Em segundos.',
+    s: 'Legendas do YouTube em TXT, com tempo ou SRT. Resumo com a sua IA.',
+    b: 'Grátis · Sem anúncio · Sem cadastro',
+  },
+  en: {
+    h: 'What the video says, as text.',
+    a: 'In seconds.',
+    s: 'YouTube subtitles as TXT, with time or SRT. Summaries with your own AI.',
+    b: 'Free · No ads · No sign-up',
+  },
+  es: {
+    h: 'Lo que dice el video, en texto.',
+    a: 'En segundos.',
+    s: 'Subtítulos de YouTube en TXT, con tiempo o SRT. Resumen con tu propia IA.',
+    b: 'Gratis · Sin anuncios · Sin registro',
+  },
 };
 
 const html = (c) => `<!doctype html><html><head><style>
