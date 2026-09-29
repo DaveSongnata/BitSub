@@ -60,7 +60,13 @@ export async function GET(request: Request): Promise<Response> {
     return json(video, 200, 'public, max-age=0, s-maxage=18000, stale-while-revalidate=600');
   } catch (e) {
     const code = e instanceof RelayError ? e.code : 'unknown';
-    const cache = code === 'not_found' || code === 'no_captions' ? 'public, max-age=0, s-maxage=900' : 'no-store';
+    // Blocked/rate-limited answers are cached briefly so repeated tries don't keep hitting YouTube.
+    const cache =
+      code === 'not_found' || code === 'no_captions'
+        ? 'public, max-age=0, s-maxage=900'
+        : code === 'blocked' || code === 'rate_limited'
+          ? 'public, max-age=0, s-maxage=120'
+          : 'no-store';
     const message = e instanceof RelayError && code === 'no_captions' ? e.message : undefined;
     return json({ error: code, message }, STATUS[code] ?? 502, cache);
   } finally {
