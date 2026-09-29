@@ -1,0 +1,152 @@
+import { describe, expect, it } from 'vitest';
+import { parseYouTubeLink } from '../youtube/url';
+import {
+  exportTranscript,
+  exportFileName,
+  formatClock,
+  normalizeCues,
+  parsePastedTranscript,
+  slugify,
+  toTimedBlocks,
+  type Cue,
+} from '../transcript';
+import { parseJson3, selectTrack, type VideoInfo } from '../youtube/client';
+
+describe('parseYouTubeLink', () => {
+  const id = 'dQw4w9WgXcQ';
+  it.each([
+    [`https://www.youtube.com/watch?v=${id}`],
+    [`https://youtube.com/watch?feature=share&v=${id}&list=PL123&index=2`],
+    [`https://m.youtube.com/watch?v=${id}`],
+    [`https://music.youtube.com/watch?v=${id}&si=abc`],
+    [`https://youtu.be/${id}?si=xyz`],
+    [`youtu.be/${id}`],
+    [`https://www.youtube.com/shorts/${id}?feature=share`],
+    [`https://www.youtube.com/live/${id}?si=a`],
+    [`https://www.youtube.com/embed/${id}?start=30`],
+    [`https://www.youtube-nocookie.com/embed/${id}`],
+    [`Olha esse vídeo: https://youtu.be/${id}?si=abc muito bom`],
+    [id],
+  ])('finds the id in %s', (input) => {
+    expect(parseYouTubeLink(input)?.videoId).toBe(id);
+  });
+
+  it('reads start times', () => {
+    expect(parseYouTubeLink(`https://youtu.be/${id}?t=90`)?.start).toBe(90);
+    expect(parseYouTubeLink(`https://www.youtube.com/watch?v=${id}&t=1m5s`)?.start).toBe(65);
+  });
+
+  it('flags playlist-only links and rejects other sites', () => {
+    expect(parseYouTubeLink('https://www.youtube.com/playlist?list=PL123')).toEqual({ videoId: null, playlistOnly: true });
+    expect(parseYouTubeLink('https://vimeo.com/123')?.videoId ?? null).toBeNull();
+    expect(parseYouTubeLink('hello world')?.videoId ?? null).toBeNull();
+    expect(parseYouTubeLink('')).toBeNull();
+  });
+});
+
+const cues: Cue[] = [
+  { start: 1.36, end: 3.04, text: 'Olá, pessoal.' },
+  { start: 3.0, end: 6.5, text: 'Hoje vamos falar\nde legendas.' },
+  { start: 6.5, end: 9, text: 'É fácil!' },
+];
+
+describe('exporters', () => {
+  it('writes valid SRT', () => {
+    const srt = exportTranscript(normalizeCues(cues), 'srt');
+    expect(srt).toContain('1\n00:00:01,360 --> 00:00:03,000\nOlá, pessoal.');
+    expect(srt).toContain('2\n00:00:03,000 --> 00:00:06,500\nHoje vamos falar de legendas.');
+  });
+  it('writes valid VTT', () => {
+    const vtt = exportTranscript(normalizeCues(cues), 'vtt');
+    expect(vtt.startsWith('WEBVTT\n\n00:00:01.360 --> 00:00:03.000')).toBe(true);
+  });
+  it('writes TXT with and without time, with optional header', () => {
+    const n = normalizeCues(cues);
+    expect(exportTranscript(n, 'txt')).toBe('Olá, pessoal. Hoje vamos falar de legendas. É fácil!\n');
+    expect(exportTranscript(n, 'txt-time')).toMatch(/^\[00:01\] Olá/);
+    expect(exportTranscript(n, 'txt', { includeHeader: true, title: 'T', url: 'U' })).toMatch(/^T\nU\n\n/);
+  });
+  it('formats clocks and file names', () => {
+    expect(formatClock(75)).toBe('01:15');
+    expect(formatClock(3725)).toBe('1:02:05');
+    expect(slugify('Ação & Reação: Parte 1!')).toBe('acao-reacao-parte-1');
+    expect(exportFileName('Meu Vídeo', 'pt-BR', 'txt-time')).toBe('meu-video.pt-BR.com-tempo.txt');
+  });
+  it('splits unpunctuated captions into short blocks', () => {
+    const many: Cue[] = Array.from({ length: 40 }, (_, i) => ({ start: i * 2, end: i * 2 + 2, text: 'palavra de teste aqui' }));
+    const blocks = toTimedBlocks(many);
+    expect(blocks.length).toBeGreaterThan(5);
+    expect(blocks.every((b) => b.end - b.start <= 16)).toBe(true);
+  });
+});
+
+describe('json3 parsing', () => {
+  it('drops newline append events and fixes rolling overlaps', () => {
+    const out = parseJson3({
+      events: [
+        { tStartMs: 0, dDurationMs: 211879 },
+        { tStartMs: 320, dDurationMs: 14260, segs: [{ utf8: '[Music]' }] },
+        { tStartMs: 18790, aAppend: 1, segs: [{ utf8: '\n' }] },
+        { tStartMs: 18800, dDurationMs: 7160, segs: [{ utf8: "We're" }, { utf8: ' no', tOffsetMs: 239 }] },
+        { tStartMs: 21800, dDurationMs: 7319, segs: [{ utf8: 'love.' }] },
+      ],
+    });
+    expect(out.map((c) => c.text)).toEqual(['[Music]', "We're no", 'love.']);
+    expect(out[1]!.end).toBe(21.8);
+  });
+});
+
+describe('selectTrack', () => {
+  const info = (tracks: VideoInfo['tracks']): VideoInfo => ({
+    videoId: 'x',
+    title: '',
+    author: '',
+    lengthSeconds: 0,
+    isLive: false,
+    tracks,
+    translationLanguages: ['pt', 'en', 'es'],
+  });
+  const t = (languageCode: string, kind: 'asr' | 'manual') => ({
+    baseUrl: `https://www.youtube.com/api/timedtext?lang=${languageCode}`,
+    languageCode,
+    name: languageCode,
+    kind,
+    isTranslatable: true,
+  });
+
+  it('prefers the channel track, then auto, then translation', () => {
+    expect(selectTrack(info([t('en', 'asr'), t('pt-BR', 'manual')]), 'pt-BR')?.track.languageCode).toBe('pt-BR');
+    expect(selectTrack(info([t('pt', 'asr'), t('en', 'manual')]), 'pt-BR')).toMatchObject({
+      autoGenerated: true,
+      translated: false,
+    });
+    const tr = selectTrack(info([t('ko', 'asr')]), 'pt-BR');
+    expect(tr).toMatchObject({ translated: true, translateTo: 'pt' });
+  });
+  it('original = spoken language, human track first', () => {
+    expect(selectTrack(info([t('en', 'manual'), t('ko', 'asr'), t('ko', 'manual')]), 'original')?.track).toMatchObject({
+      languageCode: 'ko',
+      kind: 'manual',
+    });
+  });
+  it('returns null without tracks', () => {
+    expect(selectTrack(info([]), 'pt-BR')).toBeNull();
+  });
+});
+
+describe('parsePastedTranscript', () => {
+  it('reads the YouTube "Show transcript" panel format', () => {
+    const out = parsePastedTranscript('0:00\nOlá pessoal\n0:05\nhoje vamos falar\n1:02:03\nfim');
+    expect(out.map((c) => c.start)).toEqual([0, 5, 3723]);
+  });
+  it('reads SRT', () => {
+    const out = parsePastedTranscript('1\n00:00:01,000 --> 00:00:02,500\nOi\n\n2\n00:00:03,000 --> 00:00:04,000\nTudo bem?');
+    expect(out).toHaveLength(2);
+    expect(out[1]).toMatchObject({ start: 3, text: 'Tudo bem?' });
+  });
+  it('accepts plain text without times', () => {
+    const out = parsePastedTranscript('Primeira linha do texto\nSegunda linha do texto');
+    expect(out).toHaveLength(2);
+    expect(out[1]!.start).toBeGreaterThan(0);
+  });
+});
