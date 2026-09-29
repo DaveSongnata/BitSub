@@ -136,19 +136,20 @@ export function InteractiveMascot({
         <span
           role="status"
           className={cn(
-            'absolute bottom-[88%] z-10 w-max',
-            bubbleSide === 'right' ? 'left-[62%]' : 'right-[62%]',
-            ' max-w-[15rem] border-2 border-[#0d2b45] bg-[#ffecd6] px-3 py-2 text-left text-[0.95rem] font-semibold leading-snug text-[#0d2b45] shadow-[3px_3px_0_0_#0d2b45] animate-rise'
+            'absolute z-10 w-max max-w-[15rem]',
+            // right: above the head; left: beside the robot (for small robots at the top of the page)
+            bubbleSide === 'right' ? 'bottom-[88%] left-[62%]' : 'right-[96%] top-[8%] max-w-[11rem]',
+            'border-2 border-[#0d2b45] bg-[#ffecd6] px-3 py-2 text-left text-[0.95rem] font-semibold leading-snug text-[#0d2b45] shadow-[3px_3px_0_0_#0d2b45] animate-rise'
           )}
         >
           {bubble}
           <span
             aria-hidden
             className={cn(
-              'absolute -bottom-[10px] h-[10px] w-[10px] border-b-2 border-[#0d2b45] bg-[#ffecd6]',
+              'absolute border-[#0d2b45] bg-[#ffecd6]',
               bubbleSide === 'right'
-                ? 'left-3 border-l-2 [clip-path:polygon(0_0,100%_0,0_100%)]'
-                : 'right-3 border-r-2 [clip-path:polygon(0_0,100%_0,100%_100%)]'
+                ? '-bottom-[10px] left-3 h-[10px] w-[10px] border-b-2 border-l-2 [clip-path:polygon(0_0,100%_0,0_100%)]'
+                : '-right-[7px] top-3 h-3 w-3 rotate-45 border-r-2 border-t-2'
             )}
           />
         </span>
