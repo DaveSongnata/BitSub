@@ -48,6 +48,15 @@ const ptBR = {
     mobileHint: 'No app do YouTube: Compartilhar → Copiar link.',
     tip: 'Atalho: no link do YouTube, troque {{from}} por {{to}} e dê Enter.',
     pasteOwn: 'Já tem o texto do vídeo? Cole aqui e use a IA',
+    mascotLabel: 'Dizer oi pro BitSub',
+    mascotSays: [
+      'Oi!',
+      'Bora legendar?',
+      'Cola um link aí!',
+      'Eu leio o vídeo pra você.',
+      'Sem anúncio, prometo.',
+      'Clica de novo, vai.',
+    ],
     stepsTitle: 'Como funciona',
     steps: [
       { title: 'Cole o link', text: 'Qualquer link do YouTube serve: vídeo, Shorts ou live que já terminou.' },

@@ -50,6 +50,15 @@ const en: Messages = {
     mobileHint: 'In the YouTube app: Share → Copy link.',
     tip: 'Shortcut: in the YouTube link, swap {{from}} for {{to}} and hit Enter.',
     pasteOwn: "Already have the video's text? Paste it here and use the AI",
+    mascotLabel: 'Say hi to BitSub',
+    mascotSays: [
+      'Hi!',
+      'Ready for some subtitles?',
+      'Paste a link!',
+      "I'll read the video for you.",
+      'No ads, promise.',
+      'Click me again.',
+    ],
     stepsTitle: 'How it works',
     steps: [
       { title: 'Paste the link', text: 'Any YouTube link works: videos, Shorts or live streams that have ended.' },

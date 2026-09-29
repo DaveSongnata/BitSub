@@ -50,6 +50,15 @@ const es: Messages = {
     mobileHint: 'En la app de YouTube: Compartir → Copiar enlace.',
     tip: 'Atajo: en el enlace de YouTube, cambia {{from}} por {{to}} y presiona Enter.',
     pasteOwn: '¿Ya tienes el texto del video? Pégalo aquí y usa la IA',
+    mascotLabel: 'Saludar a BitSub',
+    mascotSays: [
+      '¡Hola!',
+      '¿Sacamos subtítulos?',
+      '¡Pega un enlace!',
+      'Yo leo el video por ti.',
+      'Sin anuncios, lo prometo.',
+      'Haz clic otra vez.',
+    ],
     stepsTitle: 'Cómo funciona',
     steps: [
       {
