@@ -111,7 +111,7 @@ const en: Messages = {
     otherVideo: 'Another video',
     watchOnYouTube: 'Open on YouTube',
     play: 'Watch here',
-    auto: 'Made by YouTube · may have small mistakes',
+    auto: 'YouTube auto-captions',
     manual: 'Made by the channel',
     translated: 'Auto-translated by YouTube',
     pasted: 'Text you pasted',

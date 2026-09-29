@@ -117,7 +117,7 @@ const es: Messages = {
     otherVideo: 'Otro video',
     watchOnYouTube: 'Abrir en YouTube',
     play: 'Reproducir aquí',
-    auto: 'Generados por YouTube · pueden tener pequeños errores',
+    auto: 'Subtítulos automáticos de YouTube',
     manual: 'Hechos por el canal',
     translated: 'Traducidos automáticamente por YouTube',
     pasted: 'Texto que pegaste',

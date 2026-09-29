@@ -109,7 +109,7 @@ const ptBR = {
     otherVideo: 'Outro vídeo',
     watchOnYouTube: 'Abrir no YouTube',
     play: 'Assistir aqui',
-    auto: 'Gerada pelo YouTube · pode ter errinhos',
+    auto: 'Legenda automática do YouTube',
     manual: 'Feita pelo canal',
     translated: 'Traduzida automaticamente pelo YouTube',
     pasted: 'Texto colado por você',
