@@ -1,10 +1,9 @@
 ﻿/**
- * Browser side of the transcript flow.
+ * The whole transcript flow runs in the visitor's browser:
  *
- * 1. Ask our tiny relay (/api/tracks) for the video's caption list. The relay only sees
- *    the video id; YouTube blocks this step for any site that isn't youtube.com.
- * 2. Download the caption text straight from YouTube (its caption server allows any site),
- *    so the text itself never passes through BitSub.
+ * 1. Get the video's caption list (with signed caption URLs) from YouTube, via a sandboxed
+ *    iframe (see browser-player.ts).
+ * 2. Download the caption text straight from YouTube (its caption server allows any site).
  */
 import { normalizeCues, type Cue } from '../transcript';
 import { fetchVideoInfoInBrowser } from './browser-player';
@@ -121,7 +120,7 @@ export function selectTrack(info: VideoInfo, wanted: string): Selection | null {
   };
 }
 
-// ---------------------------------------------------------------- relay
+// ---------------------------------------------------------------- caption list
 
 const TIMEOUT_MS = 20000;
 
@@ -138,39 +137,19 @@ async function withTimeout<T>(p: (signal: AbortSignal) => Promise<T>, signal?: A
   }
 }
 
-/**
- * Caption list for a video: first from the visitor's own browser (no server, their IP),
- * then from our relay if the browser path can't answer.
- */
+/** Caption list for a video, asked by the visitor's own browser (their IP, no server). */
 export async function fetchVideoInfo(videoId: string, signal?: AbortSignal): Promise<VideoInfo> {
   if (!navigator.onLine) throw new TranscriptError('offline');
+  let result;
   try {
-    const result = await fetchVideoInfoInBrowser(videoId, signal);
-    if (result.ok) return result.info;
-    throw new TranscriptError(result.code);
-  } catch (e) {
-    if (e instanceof TranscriptError || signal?.aborted) throw e;
-    // Browser path unavailable (YouTube changed something, flagged network…): use the relay.
-  }
-  return fetchVideoInfoFromRelay(videoId, signal);
-}
-
-async function fetchVideoInfoFromRelay(videoId: string, signal?: AbortSignal): Promise<VideoInfo> {
-  let res: Response;
-  try {
-    res = await withTimeout(
-      (s) => fetch(`/api/tracks?v=${encodeURIComponent(videoId)}`, { headers: { 'x-bitsub': '1' }, signal: s }),
-      signal
-    );
+    result = await fetchVideoInfoInBrowser(videoId, signal);
   } catch (e) {
     if (signal?.aborted) throw e;
-    throw new TranscriptError(navigator.onLine ? 'unknown' : 'offline', e instanceof Error ? e.message : undefined);
+    // No usable answer (YouTube changed something, flagged network…)
+    throw new TranscriptError('blocked', e instanceof Error ? e.message : undefined);
   }
-  const data = (await res.json().catch(() => null)) as (VideoInfo & { error?: FetchErrorCode; message?: string }) | null;
-  if (!res.ok || !data || data.error) {
-    throw new TranscriptError(data?.error ?? (res.status === 429 ? 'rate_limited' : 'unknown'), data?.message);
-  }
-  return data;
+  if (result.ok) return result.info;
+  throw new TranscriptError(result.code);
 }
 
 // ---------------------------------------------------------------- caption text
