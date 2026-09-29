@@ -19,9 +19,11 @@ function Player({ videoId, title, start }: { videoId: string; title: string; sta
   useEffect(
     () =>
       onSeekRequest((s) => {
+        // Show the video only when it opens; later jumps keep the reader where they are.
+        const opening = !box.current?.querySelector('iframe');
         setPlaying((p) => p ?? { at: s });
         const r = box.current?.getBoundingClientRect();
-        if (r && (r.bottom < 80 || r.top > window.innerHeight))
+        if (opening && r && (r.bottom < 80 || r.top > window.innerHeight))
           box.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }),
     []
