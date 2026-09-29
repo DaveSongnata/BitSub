@@ -266,8 +266,70 @@ async function thinking() {
   });
 }
 
+/** Connected blobs of one exact color (4-neighbour flood fill). */
+function blobs(data, w, h, color) {
+  const is = (p) => data[p * 4 + 3] === 255 && data[p * 4] === color[0] && data[p * 4 + 1] === color[1] && data[p * 4 + 2] === color[2];
+  const seen = new Uint8Array(w * h);
+  const out = [];
+  for (let p = 0; p < w * h; p++) {
+    if (seen[p] || !is(p)) continue;
+    const pixels = [];
+    const stack = [p];
+    seen[p] = 1;
+    let x0 = w, y0 = h, x1 = 0, y1 = 0;
+    while (stack.length) {
+      const q = stack.pop();
+      pixels.push(q);
+      const x = q % w;
+      const y = (q / w) | 0;
+      x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+      for (const n of [x > 0 ? q - 1 : -1, x < w - 1 ? q + 1 : -1, y > 0 ? q - w : -1, y < h - 1 ? q + w : -1]) {
+        if (n >= 0 && !seen[n] && is(n)) {
+          seen[n] = 1;
+          stack.push(n);
+        }
+      }
+    }
+    out.push({ pixels, x0, y0, x1, y1 });
+  }
+  return out;
+}
+
+/**
+ * Mascot without its eyes (they're drawn and animated by the app: they follow the cursor and blink).
+ * Eyes = the two roundish cream blobs on the navy screen; the subtitle lines are wide, so they're skipped.
+ */
+async function mascotEyes() {
+  const [CREAM, NAVY] = [SLSO8[0], SLSO8[7]];
+  const { dots, map } = await sprite('bitsub-mascot.png', 'public/illustrations/mascot-eyeless.png', 512, (data, w, h) => {
+    const eyes = blobs(data, w, h, CREAM)
+      .filter((b) => b.pixels.length > 200)
+      .filter((b) => {
+        const bw = b.x1 - b.x0 + 1;
+        const bh = b.y1 - b.y0 + 1;
+        return bw / bh > 0.6 && bw / bh < 1.6;
+      })
+      .sort((a, b) => b.pixels.length - a.pixels.length)
+      .slice(0, 2)
+      .sort((a, b) => a.x0 - b.x0);
+    if (eyes.length !== 2) throw new Error(`expected 2 eyes, found ${eyes.length}`);
+    // Screen = the navy area around the eyes: erase a slightly bigger box so no soft edge remains
+    for (const e of eyes)
+      for (let y = e.y0 - 3; y <= e.y1 + 3; y++)
+        for (let x = e.x0 - 3; x <= e.x1 + 3; x++) {
+          const i = (y * w + x) * 4;
+          [data[i], data[i + 1], data[i + 2]] = NAVY;
+        }
+    return eyes;
+  });
+  const meta = dots.map((d) => map(d));
+  writeFileSync('src/assets/mascot-eyes.json', JSON.stringify({ eyes: meta }, null, 2) + '\n');
+  console.log('wrote src/assets/mascot-eyes.json', JSON.stringify(meta));
+}
+
 mkdirSync('src/assets', { recursive: true });
 await sprite('bitsub-mascot.png', 'public/illustrations/mascot.png', 512);
+await mascotEyes();
 if (existsSync(SRC + 'state-ai-thinking.png')) await thinking();
 await icons();
 await favicon();
