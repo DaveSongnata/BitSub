@@ -194,7 +194,8 @@ const es: Messages = {
     send: 'Preguntar',
     thinking: 'Leyendo todo el video por ti…',
     slowTitle: 'El resumen está tardando más de lo esperado…',
-    slowText: 'Los videos largos o un {{provider}} ocupado pueden demorar la respuesta. Puedes esperar un poco más, o parar e intentarlo de nuevo.',
+    slowText:
+      'Los videos largos o un {{provider}} ocupado pueden demorar la respuesta. Puedes esperar un poco más, o parar e intentarlo de nuevo.',
     slowStop: 'Parar e intentar después',
     copyAnswer: 'Copiar respuesta',
     downloadChat: 'Descargar conversación',

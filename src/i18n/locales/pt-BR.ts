@@ -186,7 +186,8 @@ const ptBR = {
     send: 'Perguntar',
     thinking: 'Lendo o vídeo inteiro pra você…',
     slowTitle: 'O resumo está demorando mais que o esperado…',
-    slowText: 'Vídeos longos ou o {{provider}} ocupado podem atrasar a resposta. Dá pra esperar mais um pouco ou parar e tentar de novo.',
+    slowText:
+      'Vídeos longos ou o {{provider}} ocupado podem atrasar a resposta. Dá pra esperar mais um pouco ou parar e tentar de novo.',
     slowStop: 'Parar e tentar depois',
     copyAnswer: 'Copiar resposta',
     downloadChat: 'Baixar conversa',
