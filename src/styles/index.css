@@ -630,6 +630,45 @@
     drop-shadow(0 1px 0 rgb(255 236 214 / 0.35)) drop-shadow(0 -1px 0 rgb(255 236 214 / 0.35));
 }
 
+/* Pixel-art cursors (mouse only). The -webkit-image-set line upgrades to the 2x art where supported. */
+@media (pointer: fine) {
+  html {
+    cursor:
+      url('/cursors/arrow.png') 1 1,
+      auto;
+    cursor:
+      -webkit-image-set(url('/cursors/arrow.png') 1x, url('/cursors/arrow@2x.png') 2x) 1 1,
+      auto;
+  }
+  a[href],
+  button:not(:disabled),
+  [role='button'],
+  [role='radio'],
+  [role='switch'],
+  [role='tab'],
+  summary,
+  label,
+  select,
+  input[type='checkbox'],
+  input[type='radio'] {
+    cursor:
+      url('/cursors/hand.png') 11 1,
+      pointer;
+    cursor:
+      -webkit-image-set(url('/cursors/hand.png') 1x, url('/cursors/hand@2x.png') 2x) 11 1,
+      pointer;
+  }
+  input:not([type='checkbox']):not([type='radio']),
+  textarea,
+  .prose-bs,
+  section[aria-labelledby='transcript-title'] p {
+    cursor: text;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+}
+
 /* Landing robot saying hi: a little 8-bit hop */
 @keyframes mascot-hop {
   0% {
