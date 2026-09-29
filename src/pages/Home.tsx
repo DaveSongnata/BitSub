@@ -8,6 +8,8 @@ import { Footer, Page } from '@/components/Shell';
 import { UrlForm } from '@/components/UrlForm';
 import { Icon } from '@/components/Icon';
 import { Mascot } from '@/components/Mascot';
+import { InteractiveMascot } from '@/components/InteractiveMascot';
+import { PixelTrail } from '@/components/PixelTrail';
 import { PasteModal } from '@/components/PlanB';
 import { Tag } from '@/components/ui';
 import { VideoTile } from '@/components/VideoTile';
@@ -16,20 +18,20 @@ function HeroScreen() {
   // A little "screen" with subtitles appearing: shows what BitSub does without words.
   const lines = [0, 1, 2];
   return (
-    <div
-      aria-hidden
-      className="relative hidden h-full min-h-[320px] overflow-hidden border-2 border-line bg-[#203c56] shadow-hard-lg lg:block"
-    >
-      <div className="absolute inset-0 opacity-[0.08] [background:repeating-linear-gradient(0deg,#ffecd6_0_1px,transparent_1px_4px)]" />
-      <div className="absolute left-6 top-6 flex gap-1.5">
+    <div className="relative hidden h-full min-h-[320px] overflow-hidden border-2 border-line bg-[#203c56] shadow-hard-lg lg:block">
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-[0.08] [background:repeating-linear-gradient(0deg,#ffecd6_0_1px,transparent_1px_4px)]"
+      />
+      <div aria-hidden className="absolute left-6 top-6 flex gap-1.5">
         <span className="h-2.5 w-2.5 bg-[#ffaa5e]" />
         <span className="h-2.5 w-2.5 bg-[#d08159]" />
         <span className="h-2.5 w-2.5 bg-[#544e68]" />
       </div>
       <div className="absolute inset-x-0 top-[16%] flex justify-center">
-        <Mascot size={200} />
+        <InteractiveMascot size={220} />
       </div>
-      <div className="absolute inset-x-8 bottom-8 space-y-2">
+      <div aria-hidden className="absolute inset-x-8 bottom-8 space-y-2">
         {lines.map((i) => (
           <div key={i} className="flex items-center gap-3 animate-rise" style={{ animationDelay: `${150 + i * 220}ms` }}>
             <span className="pixel text-[9px] text-[#ffaa5e]">
@@ -70,7 +72,10 @@ export function Home() {
         {/* Hero */}
         <section className="grid items-stretch gap-8 lg:grid-cols-12 lg:gap-10" aria-labelledby="hero-title">
           <div className="flex flex-col lg:col-span-7">
-            <Tag className="self-start">{t('home.badge')}</Tag>
+            <div className="flex items-end justify-between gap-4">
+              <Tag className="self-start">{t('home.badge')}</Tag>
+              <InteractiveMascot size={88} bubbleSide="left" className="-mb-3 -mt-6 lg:hidden" />
+            </div>
             <h1
               id="hero-title"
               className="mt-5 text-balance text-[2.625rem] font-semibold leading-[1.02] tracking-[-0.035em] sm:text-[3.5rem] lg:text-[4rem]"
@@ -202,6 +207,7 @@ export function Home() {
       </Page>
       <Footer />
       <PasteModal open={paste} onClose={() => setPaste(false)} />
+      <PixelTrail />
     </>
   );
 }
