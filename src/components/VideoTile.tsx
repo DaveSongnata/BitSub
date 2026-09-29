@@ -23,7 +23,7 @@ export function VideoTile({ video, href }: { video: SavedVideo; href: string }) 
           />
         ) : (
           <div className="flex h-full items-center justify-center">
-            <Mascot size={48} />
+            <Mascot size={48} className="mascot-rim" />
           </div>
         )}
         {video.lengthSeconds ? (

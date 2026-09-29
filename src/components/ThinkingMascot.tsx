@@ -19,7 +19,7 @@ export function ThinkingMascot({ size = 128, className, label }: { size?: number
         alt=""
         width={size}
         height={size}
-        className="absolute inset-0 h-full w-full [image-rendering:pixelated]"
+        className="mascot-art absolute inset-0 h-full w-full [image-rendering:pixelated]"
         draggable={false}
       />
       {meta.dots.map((d, i) => (

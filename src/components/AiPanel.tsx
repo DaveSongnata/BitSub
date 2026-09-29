@@ -334,7 +334,7 @@ function Chat({ video, provider, apiKey }: { video: AiVideo; provider: Provider;
       <div ref={scroller} className="scroll-thin -mx-1 min-h-0 flex-1 space-y-4 overflow-y-auto px-1" aria-live="polite">
         {!messages.length && !busy ? (
           <div className="flex items-center gap-4 border-2 border-dashed border-hair p-4">
-            <Mascot size={48} mood="happy" />
+            <Mascot size={48} />
             <div className="space-y-2">
               <p className="text-sm font-semibold text-muted">{t('ai.suggestions')}</p>
               <div className="flex flex-wrap gap-2">

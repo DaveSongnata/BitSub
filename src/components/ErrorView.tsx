@@ -33,7 +33,7 @@ export function ErrorView({
           {videoId ? (
             <img src={thumbnailUrl(videoId, 'mq')} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />
           ) : null}
-          <Mascot size={112} mood={error === 'offline' ? 'sleep' : 'sad'} className="relative" />
+          <Mascot size={112} className="mascot-rim relative" />
         </div>
       </div>
       <div className="flex flex-col gap-5 md:col-span-7">

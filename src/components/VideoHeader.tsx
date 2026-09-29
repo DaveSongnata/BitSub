@@ -102,7 +102,7 @@ export function VideoHeader({
             <Player videoId={video.videoId} title={video.title} start={start} />
           ) : (
             <div className="flex h-full items-center justify-center">
-              <Mascot size={96} mood="happy" />
+              <Mascot size={96} className="mascot-rim" />
             </div>
           )}
         </div>

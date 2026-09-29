@@ -623,6 +623,13 @@
   }
 }
 
+/* The art has a navy outline: on dark backgrounds, add a soft light pixel rim so the robot doesn't vanish */
+.dark .mascot-art,
+.mascot-rim {
+  filter: drop-shadow(1px 0 0 rgb(255 236 214 / 0.35)) drop-shadow(-1px 0 0 rgb(255 236 214 / 0.35))
+    drop-shadow(0 1px 0 rgb(255 236 214 / 0.35)) drop-shadow(0 -1px 0 rgb(255 236 214 / 0.35));
+}
+
 /* Thinking robot: dots light up in turn, the robot bobs a pixel (see ThinkingMascot) */
 @keyframes think-dot {
   0% {

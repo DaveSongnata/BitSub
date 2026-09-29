@@ -23,7 +23,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode; resetKey?: s
     const t = i18n.t.bind(i18n);
     return (
       <main className="mx-auto flex min-h-[60vh] max-w-6xl flex-col items-start justify-center gap-5 px-4 py-16 sm:px-6">
-        <Mascot size={96} mood="sad" />
+        <Mascot size={96} />
         <h1 className="max-w-xl text-3xl font-semibold leading-tight tracking-[-0.02em]">{t('errors.unknown')}</h1>
         <button type="button" className="btn btn-primary" onClick={() => window.location.reload()}>
           {t('common.retry')}

@@ -27,7 +27,7 @@ function HeroScreen() {
         <span className="h-2.5 w-2.5 bg-[#544e68]" />
       </div>
       <div className="absolute inset-x-0 top-[16%] flex justify-center">
-        <img src="/illustrations/mascot.png" alt="" width={200} height={200} className="[image-rendering:pixelated]" />
+        <Mascot size={200} />
       </div>
       <div className="absolute inset-x-8 bottom-8 space-y-2">
         {lines.map((i) => (
@@ -163,7 +163,7 @@ export function Home() {
       <section className="mt-20 border-y-2 border-line bg-ink text-on-ink" aria-labelledby="privacy-title">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-12">
           <div className="md:col-span-4">
-            <Mascot size={56} mood="happy" />
+            <Mascot size={56} className="mascot-rim" />
             <h2 id="privacy-title" className="mt-5 text-balance text-[1.875rem] font-semibold leading-tight tracking-[-0.02em]">
               {t('home.privacyTitle')}
             </h2>

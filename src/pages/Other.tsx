@@ -96,7 +96,7 @@ export function History() {
           <Dots size="lg" />
         ) : videos.length === 0 ? (
           <div className="flex flex-col items-start gap-5 border-2 border-dashed border-line p-8 sm:flex-row sm:items-center">
-            <Mascot size={80} mood="sleep" />
+            <Mascot size={80} />
             <div className="space-y-4">
               <p className="max-w-md text-lg">{t('history.empty')}</p>
               <Link href="/" className="btn btn-primary">
@@ -157,7 +157,7 @@ export function NotFound() {
   const { t } = useTranslation();
   return (
     <Page className="flex min-h-[60vh] flex-col items-start justify-center gap-5 py-16">
-      <Mascot size={96} mood="wow" />
+      <Mascot size={96} />
       <h1 className="text-4xl font-semibold tracking-[-0.025em]">{t('notFound.title')}</h1>
       <p className="text-lg text-muted">{t('notFound.text')}</p>
       <Link href="/" className="btn btn-primary">
